@@ -1,0 +1,51 @@
+/* Query 1 */
+SELECT a.Title AS "ALBUMS", sum( il.UnitPrice*il.Quantity) AS "TOTAL_SALES_AMOUNT", ar.Name AS "ARTIST_NAME"
+FROM Artist ar
+JOIN Album a
+ON ar.ArtistId=a.ArtistId
+JOIN Track t
+ON a.AlbumId=t.AlbumId
+JOIN InvoiceLine il
+ON t.TrackId=il.TrackId
+GROUP BY a.AlbumId
+ORDER BY 2 DESC
+LIMIT 10;
+
+/* Query 2 */
+SELECT e.EmployeeId,e.Title, e.FirstName, e.LastName, count(*) AS "CUSTOMERS_ATTENDED_TO"
+FROM Employee e
+JOIN Customer c
+ON e.EmployeeId = c.SupportRepId
+GROUP BY 1
+ORDER BY 5;
+
+/* Query 3 */
+SELECT g.Name AS "GENRE_NAME",  sum( il.UnitPrice*il.Quantity) AS "INVOICE_TOTAL"
+FROM Genre g
+JOIN Track t
+ON g.GenreId = t.GenreId
+JOIN InvoiceLine il
+ON t.TrackId = il.TrackId
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10;
+
+/* Query 4 */
+WITH T1 AS(
+SELECT ar.Name AS "ARTIST_NAME", sum(il.UnitPrice) AS "INVOICE_TOTAL",
+ CASE WHEN sum(il.UnitPrice) >60 THEN 'TOP' 
+	WHEN sum(il.UnitPrice) BETWEEN 30 AND 60 THEN 'AVERAGE'
+	ELSE 'LOW' END AS RANKING
+FROM Artist ar
+JOIN Album a
+ON ar.ArtistId = a.ArtistId
+JOIN Track t
+ON a.AlbumId = t.AlbumId
+JOIN InvoiceLine il
+ON il.TrackId = t.TrackId
+GROUP by 1
+order by 2 DESC)
+SELECT RANKING, count(*) AS NUMBER_OF_ARTISTS
+FROM T1
+GROUP BY 1
+ORDER BY 2;
